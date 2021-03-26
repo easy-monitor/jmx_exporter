@@ -8,10 +8,6 @@
 # 用户自定义
 process_name="jmx_exporter"       # 进程名
 
-
-# 停止进程
-if [[ "${process_name}x" != "x" ]]; then
-    killall ${process_name}
-fi
+ps -fC java | grep ${process_name} | awk '{print $2}' | xargs kill 2>/dev/null
 
 exit 0

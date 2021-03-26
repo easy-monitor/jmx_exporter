@@ -14,8 +14,8 @@ install_base="/data/exporter"              # 安装根目录
 
 #############################################################
 
-# 执行准备
-install_path="${install_base}/${app_folder}/"
+ # 执行准备
+install_path="${install_base}/${app_folder}"
 if [[ ! -d ${install_path} ]]; then
     echo "${install_path} is not exist"
     exit 1
@@ -29,8 +29,9 @@ fi
 
 
 # 启动命令
-jar=$(ls ${install_path}/jmx_prometheus_httpserver-*.jar)
-start_cmd="java -jar .${jar} 9108 ${config_path} >/dev/null 2>log/${app_folder}.log &"
+export PATH=/usr/local/easyops/jdk/bin:$PATH
+jar=$(ls ${install_path}/jmx_prometheus_httpserver-*-jar-with-dependencies.jar)
+start_cmd="java -jar ${jar} 9108 ${config_path} >/dev/null 2>log/${app_folder}.log &"
 
 
 # 日志目录
