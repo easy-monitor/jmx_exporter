@@ -1,8 +1,4 @@
 ---
-hostPort:
-username: 
-password: 
-
 rules:
 - pattern: ".*"
 
