@@ -9,10 +9,11 @@ pkgrel=1
 arch=('x86_64')
 options=('!strip')
 source=()
-projectdir=$(readlink -f "$startdir/../..")
+projectdir=$(readlink -f "$startdir/..")
 
 
 package() {
+    ls ${projectdir}
     cp -rf ${projectdir}/jmx_prometheus_httpserver/target/jmx_prometheus_httpserver-*.jar "${pkgdir}"
 
     install -d "$pkgdir/conf"
