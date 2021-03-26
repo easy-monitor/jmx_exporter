@@ -22,14 +22,15 @@ if [[ ! -d ${install_path} ]]; then
 fi
 
 # 配置文件
-config_path="$install_path/conf/conf.yml"
+config_path="$install_path/conf/config.yml"
 if [[ ! -f ${config_path} ]]; then
-    config_path="$install_path/conf/conf.default.yml"
+    config_path="$install_path/conf/httpserver_sample_config.yml"
 fi
 
 
 # 启动命令
-start_cmd="java -jar ./bin/jmx_prometheus_httpserver.jar 9108 ${config_path} >/dev/null 2>log/${app_folder}.log &"
+jar=$(ls ${install_path}/jmx_prometheus_httpserver-*.jar)
+start_cmd="java -jar .${jar} 9108 ${config_path} >/dev/null 2>log/${app_folder}.log &"
 
 
 # 日志目录

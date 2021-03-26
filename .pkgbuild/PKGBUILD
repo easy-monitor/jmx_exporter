@@ -9,23 +9,15 @@ pkgrel=1
 arch=('x86_64')
 options=('!strip')
 source=()
+projectdir=$(readlink -f "$startdir/../..")
 
-
-
-build() {
-    mkdir $startdir/bin
-    mvn package
-    ls -l $startdir/bin
-}
 
 package() {
-    install -d "$pkgdir/bin"
-    install -m755 "$startdir/bin/"* "$pkgdir/bin"
+    cp -rf ${projectdir}/jmx_prometheus_httpserver/target/jmx_prometheus_httpserver-*.jar "${pkgdir}"
 
     install -d "$pkgdir/conf"
-    cp -f ${_projdir}/my.default.cnf "$pkgdir/conf"
+    cp -f ${projectdir}/example_configs/httpserver_sample_config.yml "$pkgdir/conf"
 
     install -d "$pkgdir/deploy"
     install -m755 "$startdir/deploy/"* "$pkgdir/deploy"
-
 }
