@@ -79,6 +79,30 @@ public class JmxCollector extends Collector implements Collector.Describable {
         config.lastUpdate = configFile.lastModified();
     }
 
+    public JmxCollector(File in, String hostPost, String module) throws IOException, MalformedObjectNameException {
+      configFile = in;
+      Map<String, Object> yamlConfig = (Map<String, Object>)new Yaml().load(new FileReader(in));
+      if (!hostPost.isEmpty()) {   
+        yamlConfig.put("hostPort", hostPost);        
+      }
+      if (!module.isEmpty()) {
+        List<Map<String,Object>> modules = (List<Map<String,Object>>) yamlConfig.get("modules");
+        for (Map<String, Object> moduleObject : modules) {          
+          if (moduleObject.containsKey("name") && module.equals((String)moduleObject.get("name"))) {
+            if (moduleObject.containsKey("username")) {
+              yamlConfig.put("username", (String)moduleObject.get("username"));              
+            }
+            if (moduleObject.containsKey("password")) {
+              yamlConfig.put("password", (String)moduleObject.get("password"));
+            }
+            break;
+          }
+        }
+      }      
+      config = loadConfig(yamlConfig);
+      config.lastUpdate = configFile.lastModified();
+    }
+
     public JmxCollector(String yamlConfig) throws MalformedObjectNameException {
       config = loadConfig((Map<String, Object>)new Yaml().load(yamlConfig));
     }

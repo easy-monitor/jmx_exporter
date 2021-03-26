@@ -3,8 +3,7 @@ package io.prometheus.jmx;
 import java.io.File;
 import java.net.InetSocketAddress;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.exporter.HTTPServer;
+import com.sun.net.httpserver.HttpServer;
 
 public class WebServer {
 
@@ -26,8 +25,9 @@ public class WebServer {
        socket = new InetSocketAddress(host, port);
      }
 
-     new BuildInfoCollector().register();
-     new JmxCollector(new File(args[1])).register();
-     new HTTPServer(socket, CollectorRegistry.defaultRegistry);
+     HttpServer server;          
+     File f = new File(args[1]);
+     server = HttpServer.create(socket, 3);     
+     new HTTPServer(server, f, false);     
    }
 }
