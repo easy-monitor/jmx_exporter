@@ -2,17 +2,11 @@ package io.prometheus.jmx;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Collector.MetricFamilySamples;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.management.ManagementFactory;
-import java.util.List;
-import java.util.logging.LogManager;
-
 import javax.management.MBeanServer;
 
 import static org.junit.Assert.assertEquals;
@@ -27,9 +21,6 @@ public class JmxCollectorTest {
 
     @BeforeClass
     public static void OneTimeSetUp() throws Exception {
-
-        LogManager.getLogManager().readConfiguration(JmxCollectorTest.class.getResourceAsStream("/logging.properties"));
-
         // Get the Platform MBean Server.
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -221,22 +212,6 @@ public class JmxCollectorTest {
     }
 
     @Test
-    public void testDuplicateSamples() throws Exception {
-        // The following config will map all beans to Samples with name "foo" with empty labels.
-        // We still expect only one "foo" Sample, because all subsequent ones should be dropped.
-        JmxCollector jc = new JmxCollector("rules:\n- pattern: \".*\"\n  name: foo").register(registry);
-        int numberOfSamples = 0;
-        for (MetricFamilySamples mfs : jc.collect()) {
-            for (MetricFamilySamples.Sample sample : mfs.samples) {
-                if (sample.name.equals("foo") && sample.labelNames.isEmpty()) {
-                    numberOfSamples++;
-                }
-            }
-        }
-        Assert.assertEquals("Expected exactly one sample with name \"foo\" and empty labels", 1, numberOfSamples);
-    }
-
-    @Test
     public void testValueStatic() throws Exception {
       JmxCollector jc = new JmxCollector("\n---\nrules:\n- pattern: `.*`\n  name: foo\n  value: 1".replace('`','"')).register(registry);
       assertEquals(1.0, registry.getSampleValue("foo", new String[]{}, new String[]{}), .001);
@@ -308,15 +283,5 @@ public class JmxCollectorTest {
         JmxCollector jc = new JmxCollector("\n---\nrules:\n- pattern: `.*`\n  name: foo\n  value: 1\n  valueFactor: 4\n  cache: true".replace('`','"')).register(registry);
         assertTrue(registry.getSampleValue("jmx_scrape_cached_beans", new String[]{}, new String[]{}) > 0);
         assertEquals(4.0, registry.getSampleValue("foo", new String[]{}, new String[]{}), .001);
-    }
-
-    @Test
-    public void testCachedBeansEnabledRetainsHelpAcrossCollections() throws Exception {
-        JmxCollector jc = new JmxCollector("\n---\nrules:\n- pattern: `.*`\n  name: foo\n  value: 1\n  valueFactor: 4\n  cache: true\n  help: help message".replace('`','"'))
-                .register(registry);
-        List<MetricFamilySamples> samples = jc.collect();
-        assertEquals("help message", samples.get(0).help);
-        samples = jc.collect();
-        assertEquals("help message", samples.get(0).help);
     }
 }
